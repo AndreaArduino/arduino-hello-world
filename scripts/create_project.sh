@@ -12,6 +12,7 @@ AWS_PROFILE="hello-world-project" #AWS IAM profile to be used for creating resou
 AWS_REGION="eu-west-1"
 #echo -e "${AWS_ACCESS_KEY}\n${AWS_SECRET_KEY}\n${AWS_REGION}\n\n" > profile.txt
 #aws configure --profile ${AWS_PROFILE} < profile.txt
+#rm -f profile.txt
 DOMAIN_NAME="hello-world.com" #FQDN for the application
 DATE=$(date +%D-%H:%M:%S) #to be used for AWS Route53 Hosted Zone creation
 
