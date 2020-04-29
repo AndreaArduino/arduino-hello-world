@@ -1,0 +1,26 @@
+AWS
+    VPC
+        4 subnets
+            2 private with NAT GW and 2 public
+    ALB
+        redirect from http to https
+        target group -> associated to ECS service
+        use ACM certificate created with CLI
+    ECS
+        Fargate
+            1 task - 2 containers
+                nginx and uwsgi
+            private subnet
+            [logging]
+    ACM
+        create with CLI using DNS validation (https://docs.aws.amazon.com/cli/latest/reference/acm/request-certificate.html)
+        get CNAME to add to R53 for validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/describe-certificate.html (describe-certificate output -> DomainValidationOptions -> ResourceRecord)
+        add DNS zone to R53 using AWS CLI
+        add CNAME for ACM certificate validation in R53 with CLI
+        wait for certificate validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/wait/certificate-validated.html
+    Route53
+        add site domain as record set to R53 zone created with CLI
+
+Docker
+    nginx -> base config + specific file for domain forwarding requests to uwsgi web socket (127.0.0.1:8080) + hardening
+    uwsgi -> handling hello world python app and listening on port 8080

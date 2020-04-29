@@ -1,0 +1,13 @@
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:v1 -f Dockerfile .
+
+docker image push andreaarduino/arduino-hello-world:v1
+
+docker container run -it andreaarduino/arduino-hello-world:v1 bash
+
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:v2 -f docker/Dockerfile .
+
+docker image push andreaarduino/arduino-hello-world:v2
+
+docker container run -d -p 80:80 --name hello-world andreaarduino/arduino-hello-world:v2
+
+curl -H "Host: hello-world.com" http://127.0.0.1/ -vvv
