@@ -10,12 +10,19 @@
 ##Parameters definition
 AWS_PROFILE="hello-world-project" #AWS IAM profile to be used for creating resources on AWS. AWS IAM User should be granted administrator permissions
 AWS_REGION="eu-west-1"
-#DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" #get directory of the script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )" #get directory of the script
 #echo -e "${AWS_ACCESS_KEY}\n${AWS_SECRET_KEY}\n${AWS_REGION}\n\n" > ${DIR}/profile.txt
 #aws configure --profile ${AWS_PROFILE} < ${DIR}/profile.txt
 #rm -f ${DIR}/profile.txt
 DOMAIN_NAME="hello-world.com" #FQDN for the application
 DATE=$(date +%D-%H:%M:%S) #to be used for AWS Route53 Hosted Zone creation
+PROJECT="hello-world" #project name passed as parameter to AWS Cloudformation template
+VPC_STACK_NAME=${PROJECT}"-vpc"
+
+BASE_DIR=$(realpath $0)
+BASE_DIR=$(dirname $BASE_DIR)
+BASE_DIR=$(dirname $BASE_DIR)
+VPC_CF_TEMPLATE=${BASE_DIR}"/cloudformation/vpc.json"
 
 ##create AWS Route53 Hosted Zone
 HOSTED_ZONE=$(aws route53 create-hosted-zone --name ${DOMAIN_NAME} --caller-reference ${DATE} --profile ${AWS_PROFILE} --output json)
@@ -45,3 +52,7 @@ do
     ACM_VALIDATION_STATUS=$(aws acm describe-certificate --certificate-arn  ${CERT_ARN} --profile ${AWS_PROFILE} --output json | grep ValidationStatus | awk -F '"' '{print $4}')
     sleep 3
 done
+
+##Create AWS Stacks
+#VPC
+aws cloudformation create-stack --stack-name ${VPC_STACK_NAME} --template-body file://${VPC_CF_TEMPLATE} --parameters ParameterKey=Project,ParameterValue=${PROJECT} --profile ${AWS_PROFILE} --region ${AWS_REGION}

@@ -1,0 +1,541 @@
+{
+    "Description": "Hello world project VPC",
+    "Outputs": {
+        "InternetGateway": {
+            "Description": "InternetGateway",
+            "Export": {
+                "Name": "InternetGateway"
+            },
+            "Value": {
+                "Ref": "InternetGateway"
+            }
+        },
+        "PRVA": {
+            "Description": "PRVA",
+            "Export": {
+                "Name": "PRVA"
+            },
+            "Value": {
+                "Ref": "PRVA"
+            }
+        },
+        "PRVB": {
+            "Description": "PRVB",
+            "Export": {
+                "Name": "PRVB"
+            },
+            "Value": {
+                "Ref": "PRVB"
+            }
+        },
+        "PUBA": {
+            "Description": "PUBA",
+            "Export": {
+                "Name": "PUBA"
+            },
+            "Value": {
+                "Ref": "PUBA"
+            }
+        },
+        "PUBB": {
+            "Description": "PUBB",
+            "Export": {
+                "Name": "PUBB"
+            },
+            "Value": {
+                "Ref": "PUBB"
+            }
+        },
+        "PrivateRouteTableA": {
+            "Description": "PrivateRouteTableA",
+            "Export": {
+                "Name": "PrivateRouteTableA"
+            },
+            "Value": {
+                "Ref": "PrivateRouteTableA"
+            }
+        },
+        "PrivateRouteTableB": {
+            "Description": "PrivateRouteTableB",
+            "Export": {
+                "Name": "PrivateRouteTableB"
+            },
+            "Value": {
+                "Ref": "PrivateRouteTableB"
+            }
+        },
+        "Project": {
+            "Description": "Project",
+            "Value": {
+                "Ref": "Project"
+            }
+        },
+        "PublicRouteTable": {
+            "Description": "PublicRouteTable",
+            "Export": {
+                "Name": "PublicRouteTable"
+            },
+            "Value": {
+                "Ref": "PublicRouteTable"
+            }
+        },
+        "VPC": {
+            "Description": "VPC",
+            "Export": {
+                "Name": "VPC"
+            },
+            "Value": {
+                "Ref": "VPC"
+            }
+        },
+        "VPCGatewayAttachmentIGW": {
+            "Description": "VPCGatewayAttachmentIGW",
+            "Export": {
+                "Name": "VPCGatewayAttachmentIGW"
+            },
+            "Value": {
+                "Ref": "VPCGatewayAttachmentIGW"
+            }
+        }
+    },
+    "Parameters": {
+        "Project": {
+            "Default": "hello-world",
+            "Description": "Project Name",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "InternetGateway": {
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "igw"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ]
+            },
+            "Type": "AWS::EC2::InternetGateway"
+        },
+        "InternetGatewayRoute": {
+            "DependsOn": [
+                "VPCGatewayAttachmentIGW"
+            ],
+            "Properties": {
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "GatewayId": {
+                    "Ref": "InternetGateway"
+                },
+                "RouteTableId": {
+                    "Ref": "PublicRouteTable"
+                }
+            },
+            "Type": "AWS::EC2::Route"
+        },
+        "PRVA": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Properties": {
+                "AvailabilityZone": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            "a"
+                        ]
+                    ]
+                },
+                "CidrBlock": "10.0.0.128/26",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "prva"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::Subnet"
+        },
+        "PRVB": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Properties": {
+                "AvailabilityZone": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            "b"
+                        ]
+                    ]
+                },
+                "CidrBlock": "10.0.0.192/26",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "prvb"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::Subnet"
+        },
+        "PUBA": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Properties": {
+                "AvailabilityZone": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            "a"
+                        ]
+                    ]
+                },
+                "CidrBlock": "10.0.0.0/26",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "puba"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::Subnet"
+        },
+        "PUBB": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Properties": {
+                "AvailabilityZone": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            "b"
+                        ]
+                    ]
+                },
+                "CidrBlock": "10.0.0.64/26",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "pubb"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::Subnet"
+        },
+        "PrivateRouteTableA": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "prv",
+                                    "a",
+                                    "rt"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::RouteTable"
+        },
+        "PrivateRouteTableB": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "prv",
+                                    "b",
+                                    "rt"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::RouteTable"
+        },
+        "PublicRouteTable": {
+            "DependsOn": [
+                "VPC"
+            ],
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "pub",
+                                    "rt"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::RouteTable"
+        },
+        "SubnetRouteTableAssociationPRVA": {
+            "DependsOn": [
+                "PrivateRouteTableA",
+                "PRVA"
+            ],
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "PrivateRouteTableA"
+                },
+                "SubnetId": {
+                    "Ref": "PRVA"
+                }
+            },
+            "Type": "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "SubnetRouteTableAssociationPRVB": {
+            "DependsOn": [
+                "PrivateRouteTableB",
+                "PRVB"
+            ],
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "PrivateRouteTableB"
+                },
+                "SubnetId": {
+                    "Ref": "PRVB"
+                }
+            },
+            "Type": "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "SubnetRouteTableAssociationPUBA": {
+            "DependsOn": [
+                "PublicRouteTable",
+                "PUBA"
+            ],
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "PublicRouteTable"
+                },
+                "SubnetId": {
+                    "Ref": "PUBA"
+                }
+            },
+            "Type": "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "SubnetRouteTableAssociationPUBB": {
+            "DependsOn": [
+                "PublicRouteTable",
+                "PUBB"
+            ],
+            "Properties": {
+                "RouteTableId": {
+                    "Ref": "PublicRouteTable"
+                },
+                "SubnetId": {
+                    "Ref": "PUBB"
+                }
+            },
+            "Type": "AWS::EC2::SubnetRouteTableAssociation"
+        },
+        "VPC": {
+            "Properties": {
+                "CidrBlock": "10.0.0.0/24",
+                "EnableDnsHostnames": "true",
+                "EnableDnsSupport": "true",
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "vpc"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ]
+            },
+            "Type": "AWS::EC2::VPC"
+        },
+        "VPCGatewayAttachmentIGW": {
+            "DependsOn": [
+                "InternetGateway",
+                "VPC"
+            ],
+            "Properties": {
+                "InternetGatewayId": {
+                    "Ref": "InternetGateway"
+                },
+                "VpcId": {
+                    "Ref": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::VPCGatewayAttachment"
+        }
+    }
+}
