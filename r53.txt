@@ -1,0 +1,26 @@
+{
+    "Location": "https://route53.amazonaws.com/2013-04-01/hostedzone/Z08621233141LP5TZG3EN",
+    "HostedZone": {
+        "Id": "/hostedzone/Z08621233141LP5TZG3EN",
+        "Name": "hello-world.com.",
+        "CallerReference": "04/29/20-14:23:08",
+        "Config": {
+            "PrivateZone": false
+        },
+        "ResourceRecordSetCount": 2
+    },
+    "ChangeInfo": {
+        "Id": "/change/C06973533C2EJJ3M7E0U5",
+        "Status": "PENDING",
+        "SubmittedAt": "2020-04-29T12:23:09.228Z"
+    },
+    "DelegationSet": {
+        "NameServers": [
+            "ns-75.awsdns-09.com",
+            "ns-1836.awsdns-37.co.uk",
+            "ns-906.awsdns-49.net",
+            "ns-1408.awsdns-48.org"
+        ]
+    }
+}
+

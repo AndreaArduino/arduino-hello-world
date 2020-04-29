@@ -13,9 +13,10 @@ AWS
             private subnet
             [logging]
     ACM
-        create with CLI using DNS validation (https://docs.aws.amazon.com/cli/latest/reference/acm/request-certificate.html)
-        get CNAME to add to R53 for validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/describe-certificate.html (describe-certificate output -> DomainValidationOptions -> ResourceRecord)
+        pre-requisite: install AWS CLI (https://docs.aws.amazon.com/it_it/cli/latest/userguide/install-linux.html)
         add DNS zone to R53 using AWS CLI
+        create ACM cert with CLI using DNS validation (https://docs.aws.amazon.com/cli/latest/reference/acm/request-certificate.html)
+        get CNAME to add to R53 for validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/describe-certificate.html (describe-certificate output -> DomainValidationOptions -> ResourceRecord)
         add CNAME for ACM certificate validation in R53 with CLI
         wait for certificate validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/wait/certificate-validated.html
     Route53
@@ -24,3 +25,6 @@ AWS
 Docker
     nginx -> base config + specific file for domain forwarding requests to uwsgi web socket (127.0.0.1:8080) + hardening
     uwsgi -> handling hello world python app and listening on port 8080
+
+Deploy CF stack
+    aws cloudformation create stak -> https://docs.aws.amazon.com/cli/latest/reference/cloudformation/create-stack.html (using --parameter to specify the ACM cert arn and the Route53 Hosted Zone ID)
