@@ -1,7 +1,7 @@
 AWS
     VPC
         4 subnets
-            2 private with NAT GW and 2 public
+            2 private and 2 public
     ALB
         redirect from http to https
         target group -> associated to ECS service
@@ -13,7 +13,10 @@ AWS
             private subnet
             [logging]
     ACM
-        pre-requisite: install AWS CLI (https://docs.aws.amazon.com/it_it/cli/latest/userguide/install-linux.html)
+        pre-requisites:
+            install AWS CLI (https://docs.aws.amazon.com/it_it/cli/latest/userguide/install-linux.html)
+            have an AWS Account
+            create IAM user with admin credentials (access key and secret key needed)
         add DNS zone to R53 using AWS CLI
         create ACM cert with CLI using DNS validation (https://docs.aws.amazon.com/cli/latest/reference/acm/request-certificate.html)
         get CNAME to add to R53 for validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/describe-certificate.html (describe-certificate output -> DomainValidationOptions -> ResourceRecord)

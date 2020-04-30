@@ -1,6 +1,15 @@
 {
     "Description": "Hello world project VPC",
     "Outputs": {
+        "ElasticIP": {
+            "Description": "ElasticIP",
+            "Export": {
+                "Name": "ElasticIP"
+            },
+            "Value": {
+                "Ref": "ElasticIP"
+            }
+        },
         "InternetGateway": {
             "Description": "InternetGateway",
             "Export": {
@@ -8,6 +17,15 @@
             },
             "Value": {
                 "Ref": "InternetGateway"
+            }
+        },
+        "NatGateway": {
+            "Description": "NatGateway",
+            "Export": {
+                "Name": "NatGateway"
+            },
+            "Value": {
+                "Ref": "NatGateway"
             }
         },
         "PRVA": {
@@ -106,6 +124,15 @@
         }
     },
     "Resources": {
+        "ElasticIP": {
+            "DependsOn": [
+                "VPCGatewayAttachmentIGW"
+            ],
+            "Properties": {
+                "Domain": "vpc"
+            },
+            "Type": "AWS::EC2::EIP"
+        },
         "InternetGateway": {
             "Properties": {
                 "Tags": [
@@ -144,6 +171,54 @@
                 },
                 "RouteTableId": {
                     "Ref": "PublicRouteTable"
+                }
+            },
+            "Type": "AWS::EC2::Route"
+        },
+        "NatGateway": {
+            "DependsOn": [
+                "PUBA",
+                "ElasticIP"
+            ],
+            "Properties": {
+                "AllocationId": {
+                    "Fn::GetAtt": [
+                        "ElasticIP",
+                        "AllocationId"
+                    ]
+                },
+                "SubnetId": {
+                    "Ref": "PUBA"
+                }
+            },
+            "Type": "AWS::EC2::NatGateway"
+        },
+        "NatGatewayARoutePrivateRouteTableA": {
+            "DependsOn": [
+                "NatGateway"
+            ],
+            "Properties": {
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "NatGatewayId": {
+                    "Ref": "NatGateway"
+                },
+                "RouteTableId": {
+                    "Ref": "PrivateRouteTableA"
+                }
+            },
+            "Type": "AWS::EC2::Route"
+        },
+        "NatGatewayARoutePrivateRouteTableB": {
+            "DependsOn": [
+                "NatGateway"
+            ],
+            "Properties": {
+                "DestinationCidrBlock": "0.0.0.0/0",
+                "NatGatewayId": {
+                    "Ref": "NatGateway"
+                },
+                "RouteTableId": {
+                    "Ref": "PrivateRouteTableB"
                 }
             },
             "Type": "AWS::EC2::Route"

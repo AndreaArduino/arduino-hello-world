@@ -1,6 +1,6 @@
 from os import path
-from troposphere import AWS_REGION, Export, Join, Output, Parameter, Ref, Template
-from troposphere.ec2 import InternetGateway, Route, RouteTable, Subnet, SubnetRouteTableAssociation, VPC, VPCGatewayAttachment
+from troposphere import AWS_REGION, Export, Join, Output, Parameter, Ref, Template, GetAtt
+from troposphere.ec2 import InternetGateway, Route, RouteTable, Subnet, SubnetRouteTableAssociation, VPC, VPCGatewayAttachment, EIP, NatGateway
 
 ### Template Definition ###
 
@@ -110,6 +110,22 @@ for subnet in subnetlist:
 
     i = i+1
 
+### Elastic IP for NAT Gateway ###
+
+resources[ "ElasticIP" ] = template.add_resource(EIP(
+    "ElasticIP",
+    DependsOn = [ resource for resource in [ "VPCGatewayAttachmentIGW" ] ],
+    Domain = "vpc"
+))
+
+### NAT Gateway ###
+
+resources[ "NatGateway" ] = template.add_resource(NatGateway(
+    "NatGateway",
+    DependsOn = [ resource for resource in [ "PUBA", "ElasticIP" ] ],
+    AllocationId = GetAtt(resources[ "ElasticIP" ], "AllocationId" ),
+    SubnetId = Ref(resources[ "PUBA" ])))
+
 ### Routes ###
 
 template.add_resource(Route(
@@ -118,6 +134,14 @@ template.add_resource(Route(
     DestinationCidrBlock = "0.0.0.0/0",
     GatewayId = Ref(resources[ "InternetGateway" ]),
     RouteTableId = Ref(resources[ "PublicRouteTable" ])))
+
+for routetable in [ "PrivateRouteTableA", "PrivateRouteTableB" ]:
+    template.add_resource(Route(
+        "NatGatewayRoute" + routetable,
+        DependsOn = [ resource for resource in [ "NatGateway" ] ],
+        DestinationCidrBlock = "0.0.0.0/0",
+        NatGatewayId = Ref(resources[ "NatGateway" ]),
+        RouteTableId = Ref(routetable)))
 
 ### Template Outputs ###
 

@@ -1,0 +1,434 @@
+{
+    "Description": "Hello world project VPC",
+    "Parameters": {
+        "Project": {
+            "Default": "hello-world",
+            "Description": "Project Name",
+            "Type": "String"
+        },
+        "Route53HostedZoneID": {
+            "ConstraintDescription": "Existing hosted zone ID",
+            "Default": "",
+            "Description": "Hosted Zone ID",
+            "Type": "AWS::Route53::HostedZone::Id"
+        }
+    },
+    "Resources": {
+        "ALB": {
+            "DependsOn": [
+                "ALBSecurityGroup"
+            ],
+            "Properties": {
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Project"
+                            },
+                            "alb"
+                        ]
+                    ]
+                },
+                "Scheme": "internet-facing",
+                "SecurityGroups": [
+                    {
+                        "Ref": "ALBSecurityGroup"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Fn::ImportValue": "PUBA"
+                    },
+                    {
+                        "Fn::ImportValue": "PUBB"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "alb"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ]
+            },
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer"
+        },
+        "ALBHTTPlistener": {
+            "DependsOn": [
+                "ALB",
+                "ALBTargetGroup"
+            ],
+            "Properties": {
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": {
+                            "Ref": "ALBTargetGroup"
+                        },
+                        "Type": "forward"
+                    }
+                ],
+                "LoadBalancerArn": {
+                    "Ref": "ALB"
+                },
+                "Port": 80,
+                "Protocol": "HTTP"
+            },
+            "Type": "AWS::ElasticLoadBalancingV2::Listener"
+        },
+        "ALBSecurityGroup": {
+            "Properties": {
+                "GroupDescription": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Project"
+                            },
+                            "alb",
+                            "sg"
+                        ]
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "alb",
+                                    "sg"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Fn::ImportValue": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "ALBSgRuleHTTP": {
+            "DependsOn": [
+                "ALBSecurityGroup"
+            ],
+            "Properties": {
+                "CidrIp": "0.0.0.0/0",
+                "FromPort": 80,
+                "GroupId": {
+                    "Ref": "ALBSecurityGroup"
+                },
+                "IpProtocol": "tcp",
+                "ToPort": 80
+            },
+            "Type": "AWS::EC2::SecurityGroupIngress"
+        },
+        "ALBSgRuleHTTPS": {
+            "DependsOn": [
+                "ALBSecurityGroup"
+            ],
+            "Properties": {
+                "CidrIp": "0.0.0.0/0",
+                "FromPort": 443,
+                "GroupId": {
+                    "Ref": "ALBSecurityGroup"
+                },
+                "IpProtocol": "tcp",
+                "ToPort": 443
+            },
+            "Type": "AWS::EC2::SecurityGroupIngress"
+        },
+        "ALBTargetGroup": {
+            "DependsOn": [
+                "ALB"
+            ],
+            "Properties": {
+                "HealthCheckIntervalSeconds": 10,
+                "HealthCheckPath": "/hello",
+                "HealthCheckProtocol": "HTTP",
+                "HealthCheckTimeoutSeconds": 5,
+                "HealthyThresholdCount": 3,
+                "Port": 80,
+                "Protocol": "HTTP",
+                "Tags": [
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "TargetGroupAttributes": [
+                    {
+                        "Key": "deregistration_delay.timeout_seconds",
+                        "Value": "90"
+                    },
+                    {
+                        "Key": "stickiness.enabled",
+                        "Value": "true"
+                    },
+                    {
+                        "Key": "stickiness.type",
+                        "Value": "lb_cookie"
+                    }
+                ],
+                "TargetType": "ip",
+                "UnhealthyThresholdCount": 3,
+                "VpcId": {
+                    "Fn::ImportValue": "VPC"
+                }
+            },
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup"
+        },
+        "ECSTaskRuleHTTP": {
+            "DependsOn": [
+                "HelloWorldECSTaskSecurityGroup"
+            ],
+            "Properties": {
+                "FromPort": 80,
+                "GroupId": {
+                    "Ref": "HelloWorldECSTaskSecurityGroup"
+                },
+                "IpProtocol": "tcp",
+                "SourceSecurityGroupId": {
+                    "Ref": "ALBSecurityGroup"
+                },
+                "ToPort": 80
+            },
+            "Type": "AWS::EC2::SecurityGroupIngress"
+        },
+        "HelloWorldECSCluster": {
+            "Properties": {
+                "ClusterName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Project"
+                            },
+                            "cluster"
+                        ]
+                    ]
+                }
+            },
+            "Type": "AWS::ECS::Cluster"
+        },
+        "HelloWorldECSService": {
+            "DependsOn": [
+                "ALBHTTPlistener",
+                "HelloWorldTaskDef",
+                "HelloWorldECSCluster"
+            ],
+            "Properties": {
+                "Cluster": {
+                    "Fn::GetAtt": [
+                        "HelloWorldECSCluster",
+                        "Arn"
+                    ]
+                },
+                "DeploymentConfiguration": {
+                    "MaximumPercent": 100,
+                    "MinimumHealthyPercent": 0
+                },
+                "DesiredCount": 1,
+                "HealthCheckGracePeriodSeconds": 300,
+                "LaunchType": "FARGATE",
+                "LoadBalancers": [
+                    {
+                        "ContainerName": "hello-world",
+                        "ContainerPort": 80,
+                        "TargetGroupArn": {
+                            "Ref": "ALBTargetGroup"
+                        }
+                    }
+                ],
+                "NetworkConfiguration": {
+                    "AwsvpcConfiguration": {
+                        "AssignPublicIp": "DISABLED",
+                        "SecurityGroups": [
+                            {
+                                "Ref": "HelloWorldECSTaskSecurityGroup"
+                            }
+                        ],
+                        "Subnets": [
+                            {
+                                "Fn::ImportValue": "PRVA"
+                            },
+                            {
+                                "Fn::ImportValue": "PRVB"
+                            }
+                        ]
+                    }
+                },
+                "ServiceName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Project"
+                            },
+                            "ecs",
+                            "service"
+                        ]
+                    ]
+                },
+                "TaskDefinition": {
+                    "Ref": "HelloWorldTaskDef"
+                }
+            },
+            "Type": "AWS::ECS::Service"
+        },
+        "HelloWorldECSTaskSecurityGroup": {
+            "Properties": {
+                "GroupDescription": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Project"
+                            },
+                            "fargate",
+                            "sg"
+                        ]
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "-",
+                                [
+                                    {
+                                        "Ref": "Project"
+                                    },
+                                    "fargate",
+                                    "sg"
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "Key": "Project",
+                        "Value": {
+                            "Ref": "Project"
+                        }
+                    }
+                ],
+                "VpcId": {
+                    "Fn::ImportValue": "VPC"
+                }
+            },
+            "Type": "AWS::EC2::SecurityGroup"
+        },
+        "HelloWorldRecordSetGroup": {
+            "Properties": {
+                "HostedZoneId": {
+                    "Ref": "Route53HostedZoneID"
+                },
+                "RecordSets": [
+                    {
+                        "AliasTarget": {
+                            "DNSName": {
+                                "Fn::GetAtt": [
+                                    "ALB",
+                                    "DNSName"
+                                ]
+                            },
+                            "HostedZoneId": {
+                                "Fn::GetAtt": [
+                                    "ALB",
+                                    "CanonicalHostedZoneID"
+                                ]
+                            }
+                        },
+                        "Name": "arduino-hello-world.com",
+                        "Type": "A"
+                    }
+                ]
+            },
+            "Type": "AWS::Route53::RecordSetGroup"
+        },
+        "HelloWorldTaskDef": {
+            "Properties": {
+                "ContainerDefinitions": [
+                    {
+                        "Cpu": 512,
+                        "Image": "andreaarduino/arduino-hello-world:v4",
+                        "Memory": 1024,
+                        "Name": "hello-world",
+                        "PortMappings": [
+                            {
+                                "ContainerPort": 80,
+                                "HostPort": 80,
+                                "Protocol": "tcp"
+                            }
+                        ]
+                    }
+                ],
+                "Cpu": "512",
+                "ExecutionRoleArn": {
+                    "Fn::GetAtt": [
+                        "HelloWorldTaskExecutionRole",
+                        "Arn"
+                    ]
+                },
+                "Memory": "1024",
+                "NetworkMode": "awsvpc",
+                "RequiresCompatibilities": [
+                    "FARGATE"
+                ]
+            },
+            "Type": "AWS::ECS::TaskDefinition"
+        },
+        "HelloWorldTaskExecutionRole": {
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [
+                        {
+                            "Action": "sts:AssumeRole",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "ecs-tasks.amazonaws.com"
+                            },
+                            "Sid": ""
+                        }
+                    ],
+                    "Version": "2008-10-17"
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+                ],
+                "Path": "/",
+                "RoleName": "HelloWorldTaskExecutionRole"
+            },
+            "Type": "AWS::IAM::Role"
+        }
+    }
+}
