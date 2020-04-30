@@ -193,7 +193,7 @@
             },
             "Type": "AWS::EC2::NatGateway"
         },
-        "NatGatewayARoutePrivateRouteTableA": {
+        "NatGatewayRoutePrivateRouteTableA": {
             "DependsOn": [
                 "NatGateway"
             ],
@@ -208,7 +208,7 @@
             },
             "Type": "AWS::EC2::Route"
         },
-        "NatGatewayARoutePrivateRouteTableB": {
+        "NatGatewayRoutePrivateRouteTableB": {
             "DependsOn": [
                 "NatGateway"
             ],

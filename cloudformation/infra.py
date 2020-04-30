@@ -196,19 +196,34 @@ resources["HelloWorldTaskExecutionRole"] = template.add_resource(Role(
 
 resources[ "HelloWorldTaskDef" ] = template.add_resource(TaskDefinition(
     "HelloWorldTaskDef",
-    ContainerDefinitions = [ ContainerDefinition(
-        "HelloWorldContDef",
-        Cpu = 512,
-        Image = "andreaarduino/arduino-hello-world:v4",
-        Memory = 1024,
-        Name = "hello-world",
+    ContainerDefinitions = [
+    ContainerDefinition(
+        "HelloWorldWebContDef",
+        Cpu = 256,
+        Image = "andreaarduino/arduino-hello-world:web-v1",
+        Memory = 512,
+        Name = "hello-world-web",
         PortMappings = [ PortMapping(
             "HelloWorldPortMapping",
             ContainerPort = 80,
             HostPort = 80,
             Protocol = "tcp"
             )],
-        )],
+        ),
+    ContainerDefinition(
+        "HelloWorldAppContDef",
+        Cpu = 256,
+        Image = "andreaarduino/arduino-hello-world:app-v1",
+        Memory = 512,
+        Name = "hello-world-app",
+        PortMappings = [ PortMapping(
+            "HelloWorldPortMapping",
+            ContainerPort = 8080,
+            HostPort = 8080,
+            Protocol = "tcp"
+            )]
+        )
+    ],
     Cpu = "512",
     ExecutionRoleArn = GetAtt(resources[ "HelloWorldTaskExecutionRole" ], "Arn"),
     Memory = "1024",
@@ -231,7 +246,7 @@ resources[ "HelloWorldECSService" ] = template.add_resource(Service(
     LaunchType = "FARGATE",
     LoadBalancers = [ LoadBalancer(
         "HelloWorldECSServiceLB",
-        ContainerName = "hello-world",
+        ContainerName = "hello-world-web",
         ContainerPort = 80,
         TargetGroupArn = Ref(resources[ "ALBTargetGroup" ]),
         )],

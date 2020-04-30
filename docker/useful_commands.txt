@@ -33,4 +33,22 @@ docker image push andreaarduino/arduino-hello-world:v4
 
 
 
+
+
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:web-v1 -f docker/nginx/Dockerfile .
+docker image push andreaarduino/arduino-hello-world:web-v1
+
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:app-v1 -f docker/hello-world/Dockerfile .
+docker image push andreaarduino/arduino-hello-world:app-v1
+
+
+
+
+
+
+
+
+
+
+
 curl -H "Host: arduino-hello-world.com" http://127.0.0.1/hello -vvv
