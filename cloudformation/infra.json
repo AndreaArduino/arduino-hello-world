@@ -6,11 +6,11 @@
             "Description": "Project Name",
             "Type": "String"
         },
-        "Route53HostedZoneID": {
-            "ConstraintDescription": "Existing hosted zone ID",
+        "SSLCertificateALB": {
+            "ConstraintDescription": "SSL Certificate ARN",
             "Default": "",
-            "Description": "Hosted Zone ID",
-            "Type": "AWS::Route53::HostedZone::Id"
+            "Description": "SSL certificate ARN for ALB",
+            "Type": "String"
         }
     },
     "Resources": {
@@ -69,6 +69,35 @@
             },
             "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer"
         },
+        "ALBHTTPSlistener": {
+            "DependsOn": [
+                "ALB",
+                "ALBTargetGroup"
+            ],
+            "Properties": {
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "SSLCertificateALB"
+                        }
+                    }
+                ],
+                "DefaultActions": [
+                    {
+                        "TargetGroupArn": {
+                            "Ref": "ALBTargetGroup"
+                        },
+                        "Type": "forward"
+                    }
+                ],
+                "LoadBalancerArn": {
+                    "Ref": "ALB"
+                },
+                "Port": 443,
+                "Protocol": "HTTPS"
+            },
+            "Type": "AWS::ElasticLoadBalancingV2::Listener"
+        },
         "ALBHTTPlistener": {
             "DependsOn": [
                 "ALB",
@@ -77,10 +106,15 @@
             "Properties": {
                 "DefaultActions": [
                     {
-                        "TargetGroupArn": {
-                            "Ref": "ALBTargetGroup"
+                        "RedirectConfig": {
+                            "Host": "#{host}",
+                            "Path": "/#{path}",
+                            "Port": "443",
+                            "Protocol": "HTTPS",
+                            "Query": "#{query}",
+                            "StatusCode": "HTTP_301"
                         },
-                        "Type": "forward"
+                        "Type": "redirect"
                     }
                 ],
                 "LoadBalancerArn": {
@@ -174,6 +208,17 @@
                 "HealthCheckProtocol": "HTTP",
                 "HealthCheckTimeoutSeconds": 5,
                 "HealthyThresholdCount": 3,
+                "Name": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            {
+                                "Ref": "Project"
+                            },
+                            "tg"
+                        ]
+                    ]
+                },
                 "Port": 80,
                 "Protocol": "HTTP",
                 "Tags": [
@@ -347,40 +392,12 @@
             },
             "Type": "AWS::EC2::SecurityGroup"
         },
-        "HelloWorldRecordSetGroup": {
-            "Properties": {
-                "HostedZoneId": {
-                    "Ref": "Route53HostedZoneID"
-                },
-                "RecordSets": [
-                    {
-                        "AliasTarget": {
-                            "DNSName": {
-                                "Fn::GetAtt": [
-                                    "ALB",
-                                    "DNSName"
-                                ]
-                            },
-                            "HostedZoneId": {
-                                "Fn::GetAtt": [
-                                    "ALB",
-                                    "CanonicalHostedZoneID"
-                                ]
-                            }
-                        },
-                        "Name": "arduino-hello-world.com",
-                        "Type": "A"
-                    }
-                ]
-            },
-            "Type": "AWS::Route53::RecordSetGroup"
-        },
         "HelloWorldTaskDef": {
             "Properties": {
                 "ContainerDefinitions": [
                     {
                         "Cpu": 256,
-                        "Image": "andreaarduino/arduino-hello-world:web-v1",
+                        "Image": "andreaarduino/arduino-hello-world:web-v2",
                         "Memory": 512,
                         "Name": "hello-world-web",
                         "PortMappings": [
@@ -393,7 +410,7 @@
                     },
                     {
                         "Cpu": 256,
-                        "Image": "andreaarduino/arduino-hello-world:app-v1",
+                        "Image": "andreaarduino/arduino-hello-world:app-v2",
                         "Memory": 512,
                         "Name": "hello-world-app",
                         "PortMappings": [

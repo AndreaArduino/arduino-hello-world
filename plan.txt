@@ -1,3 +1,8 @@
+pre-requisites:
+    install AWS CLI (https://docs.aws.amazon.com/it_it/cli/latest/userguide/install-linux.html)
+    have an AWS Account
+    create IAM user with admin credentials (access key and secret key needed)
+
 AWS
     VPC
         4 subnets
@@ -13,17 +18,7 @@ AWS
             private subnet
             [logging]
     ACM
-        pre-requisites:
-            install AWS CLI (https://docs.aws.amazon.com/it_it/cli/latest/userguide/install-linux.html)
-            have an AWS Account
-            create IAM user with admin credentials (access key and secret key needed)
-        add DNS zone to R53 using AWS CLI
-        create ACM cert with CLI using DNS validation (https://docs.aws.amazon.com/cli/latest/reference/acm/request-certificate.html)
-        get CNAME to add to R53 for validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/describe-certificate.html (describe-certificate output -> DomainValidationOptions -> ResourceRecord)
-        add CNAME for ACM certificate validation in R53 with CLI
-        wait for certificate validation -> https://docs.aws.amazon.com/cli/latest/reference/acm/wait/certificate-validated.html
-    Route53
-        add site domain as record set to R53 zone created with CLI
+        upload self signed certificate
 
 Docker
     nginx -> base config + specific file for domain forwarding requests to uwsgi web socket (127.0.0.1:8080) + hardening

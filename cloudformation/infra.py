@@ -2,7 +2,7 @@ from os import path
 from troposphere import AWS_REGION, Join, Parameter, Ref, Template, GetAtt, Tags, ImportValue
 from troposphere.route53 import AliasTarget, RecordSet, RecordSetGroup
 from troposphere.ec2 import SecurityGroup, SecurityGroupIngress
-from troposphere.elasticloadbalancingv2 import LoadBalancer as AppLoadBalancer, TargetGroup, Listener as AppListener, TargetGroupAttribute, Action, Certificate
+from troposphere.elasticloadbalancingv2 import LoadBalancer as AppLoadBalancer, TargetGroup, Listener as AppListener, TargetGroupAttribute, Action, Certificate, RedirectConfig, Action
 from troposphere.ecs import DeploymentConfiguration, LoadBalancer, Service, Cluster, TaskDefinition, ContainerDefinition, PortMapping, NetworkConfiguration, AwsvpcConfiguration
 from troposphere.iam import Role, User
 
@@ -22,13 +22,6 @@ parameters[ "Project" ] = template.add_parameter(Parameter(
     Type="String",
     Description="Project Name",
     Default="hello-world"))
-
-parameters[ "Route53HostedZoneID" ] = template.add_parameter(Parameter(
-    "Route53HostedZoneID",
-    ConstraintDescription = "Existing hosted zone ID",
-    Description = "Hosted Zone ID",
-    Default = "",
-    Type = "AWS::Route53::HostedZone::Id"))
 
 ### Security Groups ###
 
@@ -80,14 +73,12 @@ resources[ "ECSTaskRuleHTTP" ] = template.add_resource(SecurityGroupIngress(
 
 ### Application Load Balancer SSL Certificate ###
 
-'''
 parameters["SSLCertificateALB"] = template.add_parameter(Parameter(
-    "SSLCertificateELB",
+    "SSLCertificateALB",
     ConstraintDescription = "SSL Certificate ARN",
     Description = "SSL certificate ARN for ALB",
-    Default = "arn:aws:acm:eu-west-1:007023067155:certificate/8827afe7-02a8-4464-94de-902dde8171e0",
+    Default = "",
     Type = "String"))
-'''
 
 ### Application Load Balancer ###
 
@@ -106,21 +97,19 @@ resources[ "ALB" ] = template.add_resource(AppLoadBalancer(
 resources[ "ALBHTTPlistener" ] = template.add_resource(AppListener(
     "ALBHTTPlistener",
     DependsOn = [ resource for resource in [ "ALB", "ALBTargetGroup" ] ],
-    DefaultActions = [ Action( Type = 'forward', TargetGroupArn = Ref("ALBTargetGroup") )],
-#        DefaultActions = [ Action( Type = 'redirect', RedirectConfig = RedirectActionConfig(
-#            Host = "#{host}",
-#            Path = "#{path}",
-#            Port = "443",
-#            Protocol = "HTTPS",
-#            Query = "#{query}",
-#            StatusCode = "HTTP_301"
-#            ) ) ],
+    DefaultActions = [ Action( Type = 'redirect', RedirectConfig = RedirectConfig(
+        Host = "#{host}",
+        Path = "/#{path}",
+        Port = "443",
+        Protocol = "HTTPS",
+        Query = "#{query}",
+        StatusCode = "HTTP_301"
+        ) ) ],
     LoadBalancerArn = Ref(resources[ "ALB" ]),
     Port = 80,
     Protocol = "HTTP"
     ))
 
-'''
 resources[ "ALBHTTPSlistener" ] = template.add_resource(AppListener(
     "ALBHTTPSlistener",
     DependsOn = [ resource for resource in [ "ALB", "ALBTargetGroup" ] ],
@@ -133,7 +122,6 @@ resources[ "ALBHTTPSlistener" ] = template.add_resource(AppListener(
     Port = 443,
     Protocol = "HTTPS"
     ))
-'''
 
 ### Application Load Balancer Target Group ###
 
@@ -145,6 +133,7 @@ resources[ "ALBTargetGroup" ] = template.add_resource(TargetGroup(
     HealthCheckProtocol = "HTTP",
     HealthCheckTimeoutSeconds = 5,
     HealthyThresholdCount = 3,
+    Name = Join("-", [ Ref(parameters[ "Project" ]), "tg" ]),
     Port = 80,
     Protocol = "HTTP",
     Tags = [ { "Key": "Project", "Value": Ref(parameters[ "Project" ]) } ],
@@ -200,7 +189,7 @@ resources[ "HelloWorldTaskDef" ] = template.add_resource(TaskDefinition(
     ContainerDefinition(
         "HelloWorldWebContDef",
         Cpu = 256,
-        Image = "andreaarduino/arduino-hello-world:web-v1",
+        Image = "andreaarduino/arduino-hello-world:web-v2",
         Memory = 512,
         Name = "hello-world-web",
         PortMappings = [ PortMapping(
@@ -213,7 +202,7 @@ resources[ "HelloWorldTaskDef" ] = template.add_resource(TaskDefinition(
     ContainerDefinition(
         "HelloWorldAppContDef",
         Cpu = 256,
-        Image = "andreaarduino/arduino-hello-world:app-v1",
+        Image = "andreaarduino/arduino-hello-world:app-v2",
         Memory = 512,
         Name = "hello-world-app",
         PortMappings = [ PortMapping(
@@ -262,21 +251,6 @@ resources[ "HelloWorldECSService" ] = template.add_resource(Service(
     ServiceName = Join("-", [ Ref(parameters[ "Project" ]), "ecs", "service" ]),
     TaskDefinition = Ref(resources[ "HelloWorldTaskDef" ])
     ))
-
-### Route 53 ###
-
-resources["HelloWorldRecordSetGroup"] = template.add_resource(RecordSetGroup(
-      "HelloWorldRecordSetGroup",
-      HostedZoneId = Ref(parameters["Route53HostedZoneID"]),
-      RecordSets = [
-          RecordSet(
-          "HelloWorldRecordSetGroup",
-          AliasTarget = AliasTarget(
-              DNSName = GetAtt( resources["ALB"], "DNSName" ),
-              HostedZoneId = GetAtt( resources[ "ALB" ], "CanonicalHostedZoneID" )),
-          Name = "arduino-hello-world.com",
-          Type = "A")
-          ]))
 
 ### Template JSON ###
 

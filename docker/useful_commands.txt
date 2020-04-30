@@ -44,6 +44,11 @@ docker image push andreaarduino/arduino-hello-world:app-v1
 
 
 
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:web-v2 -f docker/nginx/Dockerfile .
+docker image push andreaarduino/arduino-hello-world:web-v2
+
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:app-v2 -f docker/hello-world/Dockerfile .
+docker image push andreaarduino/arduino-hello-world:app-v2
 
 
 
@@ -52,3 +57,29 @@ docker image push andreaarduino/arduino-hello-world:app-v1
 
 
 curl -H "Host: arduino-hello-world.com" http://127.0.0.1/hello -vvv
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+apt-get install letsencrypt
+sudo certbot certonly --manual --preferred-challenges=dns --email andrea.arduino@outlook.com --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d arduino-hello-world.com
+
+
+
+
+
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout arduino-hello-world-com.key -out arduino-hello-world-com.crt
+
+
+CERT_ARN=$(aws acm import-certificate --certificate file://arduino-hello-world-com.crt --private-key file://arduino-hello-world-com.key --profile hello-world-project --region eu-west-1)
+echo ${CERT_ARN}
