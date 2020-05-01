@@ -397,7 +397,7 @@
                 "ContainerDefinitions": [
                     {
                         "Cpu": 256,
-                        "Image": "andreaarduino/arduino-hello-world:web-v2",
+                        "Image": "andreaarduino/arduino-hello-world:web-v3",
                         "Memory": 512,
                         "Name": "hello-world-web",
                         "PortMappings": [
@@ -410,7 +410,7 @@
                     },
                     {
                         "Cpu": 256,
-                        "Image": "andreaarduino/arduino-hello-world:app-v2",
+                        "Image": "andreaarduino/arduino-hello-world:app-v3",
                         "Memory": 512,
                         "Name": "hello-world-app",
                         "PortMappings": [

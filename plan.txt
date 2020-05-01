@@ -1,4 +1,4 @@
-pre-requisites:
+Pre-requisites:
     install AWS CLI (https://docs.aws.amazon.com/it_it/cli/latest/userguide/install-linux.html)
     have an AWS Account
     create IAM user with admin credentials (access key and secret key needed)
@@ -7,6 +7,7 @@ AWS
     VPC
         4 subnets
             2 private and 2 public
+        [FlowLogs]
     ALB
         redirect from http to https
         target group -> associated to ECS service
@@ -33,10 +34,15 @@ AWS
         [valid SSL certificate]
     [IAM]
         IAM user used for resource creation -> least privilege
+    [CI/CD]
 
 Docker
-    nginx -> base config + specific file for domain forwarding requests to uwsgi web socket (127.0.0.1:8080) + hardening
-    uwsgi -> handling hello world python app and listening on port 8080
+    nginx
+        base config + specific file for domain forwarding requests to uwsgi web socket (127.0.0.1:8080) + hardening
+        [logging]
+    uwsgi
+        handling hello world python app and listening on port 8080
+        [logging]
     [base images for packages installation + image for (web config|app cofig) deployment]
 
 Deploy CF stack

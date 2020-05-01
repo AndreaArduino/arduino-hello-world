@@ -189,7 +189,7 @@ resources[ "HelloWorldTaskDef" ] = template.add_resource(TaskDefinition(
     ContainerDefinition(
         "HelloWorldWebContDef",
         Cpu = 256,
-        Image = "andreaarduino/arduino-hello-world:web-v2",
+        Image = "andreaarduino/arduino-hello-world:web-v3",
         Memory = 512,
         Name = "hello-world-web",
         PortMappings = [ PortMapping(
@@ -202,7 +202,7 @@ resources[ "HelloWorldTaskDef" ] = template.add_resource(TaskDefinition(
     ContainerDefinition(
         "HelloWorldAppContDef",
         Cpu = 256,
-        Image = "andreaarduino/arduino-hello-world:app-v2",
+        Image = "andreaarduino/arduino-hello-world:app-v3",
         Memory = 512,
         Name = "hello-world-app",
         PortMappings = [ PortMapping(

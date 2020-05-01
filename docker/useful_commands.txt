@@ -1,38 +1,21 @@
+##Docker
+
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:v1 -f Dockerfile .
-
 docker image push andreaarduino/arduino-hello-world:v1
-
 docker container run -it andreaarduino/arduino-hello-world:v1 bash
 
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:v2 -f docker/Dockerfile .
-
 docker image push andreaarduino/arduino-hello-world:v2
-
 docker container run -d -p 80:80 --name hello-world andreaarduino/arduino-hello-world:v2
 
-
-
-
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:v3 -f docker/Dockerfile .
-
 docker image push andreaarduino/arduino-hello-world:v3
-
 docker container run -d -p 80:80 --name hello-world andreaarduino/arduino-hello-world:v3
 
-
-
-
+curl -H "Host: arduino-hello-world.com" http://127.0.0.1/hello -vvv
 
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:v4 -f docker/Dockerfile .
-
 docker image push andreaarduino/arduino-hello-world:v4
-
-
-
-
-
-
-
 
 
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:web-v1 -f docker/nginx/Dockerfile .
@@ -41,45 +24,21 @@ docker image push andreaarduino/arduino-hello-world:web-v1
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:app-v1 -f docker/hello-world/Dockerfile .
 docker image push andreaarduino/arduino-hello-world:app-v1
 
-
-
-
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:web-v2 -f docker/nginx/Dockerfile .
 docker image push andreaarduino/arduino-hello-world:web-v2
 
 cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:app-v2 -f docker/hello-world/Dockerfile .
 docker image push andreaarduino/arduino-hello-world:app-v2
 
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:web-v3 -f docker/nginx/Dockerfile .
+docker image push andreaarduino/arduino-hello-world:web-v3
 
+cd /home/andreaarduino/Desktop/Andrea/arduino-hello-world/ && docker image build -t andreaarduino/arduino-hello-world:app-v3 -f docker/hello-world/Dockerfile .
+docker image push andreaarduino/arduino-hello-world:app-v3
 
-
-
-
-
-curl -H "Host: arduino-hello-world.com" http://127.0.0.1/hello -vvv
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+##Let's encrypt
 apt-get install letsencrypt
 sudo certbot certonly --manual --preferred-challenges=dns --email andrea.arduino@outlook.com --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d arduino-hello-world.com
 
-
-
-
-
+##SSL self signed
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout arduino-hello-world-com.key -out arduino-hello-world-com.crt
-
-
-CERT_ARN=$(aws acm import-certificate --certificate file://arduino-hello-world-com.crt --private-key file://arduino-hello-world-com.key --profile hello-world-project --region eu-west-1)
-echo ${CERT_ARN}
