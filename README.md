@@ -68,10 +68,11 @@ I have designed the AWS infrastructure following the [AWS Well Architected Frame
 * **reliability**: the AWS ECS Service automatically replace the AWS ECS Fargate Task in case of any failure - e.g. if a Docker container stops working. I will explain how reliability may be improved for a deployment in Production environment - see ANSWERS.md.
 * **operational efficiency**: the application runs in a serverless infrastructure - eliminating the overhead of AWS EC2 OS management
 * **performances**: I have not considered performances during the design because it is a sample application. I will explain how this aspect may be improved for a deployment in Production environment - see ANSWERS.md.
-* **costs**: I have not considered costs during the design because it is a sample application. I will explain how this aspect may be improved for a deployment in Production environment - see ANSWERS.md.
+* **costs**: I have not considered costs during the design because it is a sample application.
 
 Other considerations:
 * I have exploited **Docker containers** to run the application because they can be easily *replicated* and *ported* in different environments
 * I have adopted **AWS Application Load Balancer** because it allows to easily and safely forward traffic to **AWS ECS Fargate Tasks**. It can also implement **redirects** - e.g. HTTP to HTTPS.
 * I have not adopted AWS EKS as a Docker orchestration tool because I have no experience with it - this is why I have chosen AWS ECS which on the other hand is a very stable and powerful AWS service designed for Docker orchestration.
 * I have adopted Nginx as a web server solution as it performs optimally when associated with UWSGI application server.
+* I have exploited AWS CloudFormation in order to deploy the AWS infrastructure with an *infrastructure-as-a-code* approach.
