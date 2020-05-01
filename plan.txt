@@ -34,6 +34,10 @@ AWS
         [valid SSL certificate]
     [IAM]
         IAM user used for resource creation -> least privilege
+    [Monitoring]
+        CloudWatch
+            ALB
+                latency, errors
     [CI/CD]
 
 Docker
