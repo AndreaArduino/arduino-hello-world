@@ -11,12 +11,12 @@ In order to successfully deploy the Hello World project please make sure to sati
 *Please note that if you already have an AWS IAM User with the required properties you can skip point 4 of the list above.*
 
 ## How to deploy the Hello World project
-Follow the instructions below in order to deploy the project
+Follow the instructions below in order to deploy the project:
 1. **Clone** the [repository](https://github.com/AndreaArduino/arduino-hello-world)
 ```
 git clone https://github.com/AndreaArduino/arduino-hello-world.git
 ```
-2. **Run the Bash script** named *create_project.sh* stored under *script* folder in the repository:
+2. **Run the Bash script** named [create_project.sh](scripts/create_project.sh) stored under *script* folder in the repository:
 ```
 bash <path/to/repo>/scripts/create_project.sh
 ```
@@ -31,18 +31,18 @@ bash <path/to/repo>/scripts/create_project.sh
 
 ## Hello World project description
 
-In this section I will explain the repository structure - for your convenience - and the high level infrastructure of the project.
+In this section I will explain the repository structure - for your convenience - and the high level infrastructure of the application.
 
 ### Repository structure
-* *cloudformation*: contains the **AWS CloudFormation templates** in JSON format as well as the source Python code - [Troposphere library](https://troposphere.readthedocs.io/en/latest/) - from which they are generated.
-  * *vpc.(json|py)*: network layer
-  * *infra.(json|py)*: application layer
-* *docker*:
-  * *hello-world*: contains **UWSGI application server** configuration file and **Dockerfile** for the application server Docker container
-  * *nginx*: contains **Nginx web server** configuration file and the **Dockerfile** for the web server Docker container
-* *hello-world*: contains the **application code** developed in Python
-* *scripts*: contains the **create_project.sh** script which handles the deployment of the project on AWS as described in the previous section.
-* *ssl*: contains **public and private key** of a self signed SSL certificate.
+* **cloudformation**: contains the **AWS CloudFormation templates** in JSON format as well as the source Python code - [Troposphere library](https://troposphere.readthedocs.io/en/latest/) - from which they are generated.
+  * **vpc.(json|py)**: network layer
+  * **infra.(json|py)**: application layer
+* **docker**:
+  * **hello-world**: contains **UWSGI application server** [configuration file](docker/hello-world/uwsgi_conf/hello-world.ini) and [Dockerfile](docker/hello-world/Dockerfile) for the application server Docker container
+  * **nginx**: contains **Nginx web server** [configuration file](docker/nginx/conf/hello-world.conf) and the [Dockerfile](docker/nginx/Dockerfile) for the web server Docker container
+* **hello-world**: contains the [application code](hello-world/hello-world.py) developed in Python
+* **scripts**: contains the [create_project.sh](scripts/create_project.sh) script which handles the deployment of the project on AWS as described in the previous section.
+* **ssl**: contains [public](ssl/arduino-hello-world-com.crt) and [private](ssl/arduino-hello-world-com.key) key of a self signed SSL certificate.
 
 ### High level infrastructure
 * **AWS Application Load Balancer**:
