@@ -64,10 +64,10 @@ In this section I will explain the repository structure - for your convenience -
 ### Hello World project design approach
 
 I have designed the AWS infrastructure following the [AWS Well Architected Framework](https://aws.amazon.com/architecture/well-architected/?nc1=h_ls) principles - which defines AWS best practices in terms of security, performances, operational efficiency, costs and reliability - with a focus on security, reliability and operational efficiency:
-* **security**: the application runs in a **private subnets** not reachable from the public Internet. The only way to access it is from the AWS ELB. I have **hardened the Nginx web server** configuration - eliminating server tokens, enabling XSS protection header and disabled unnecessary methods. I will also explain how security may be improved for a deployment in Production environment - see ANSWERS.md.
-* **reliability**: the AWS ECS Service automatically replace the AWS ECS Fargate Task in case of any failure - e.g. if a Docker container stops working. I will explain how reliability may be improved for a deployment in Production environment - see ANSWERS.md.
+* **security**: the application runs in a **private subnets** not reachable from the public Internet. The only way to access it is from the AWS ELB. I have **hardened the Nginx web server** configuration - eliminating server tokens, enabling XSS protection header and disabled unnecessary methods. I will also explain how security may be improved for a deployment in Production environment - see [ANSWERS.md](ANSWERS.md).
+* **reliability**: the AWS ECS Service automatically replace the AWS ECS Fargate Task in case of any failure - e.g. if a Docker container stops working. I will explain how reliability may be improved for a deployment in Production environment - see [ANSWERS.md](ANSWERS.md).
 * **operational efficiency**: the application runs in a serverless infrastructure - eliminating the overhead of AWS EC2 OS management
-* **performances**: I have not considered performances during the design because it is a sample application. I will explain how this aspect may be improved for a deployment in Production environment - see ANSWERS.md.
+* **performances**: I have not considered performances during the design because it is a sample application. I will explain how this aspect may be improved for a deployment in Production environment - see [ANSWERS.md](ANSWERS.md).
 * **costs**: I have not considered costs during the design because it is a sample application.
 
 Other considerations:
