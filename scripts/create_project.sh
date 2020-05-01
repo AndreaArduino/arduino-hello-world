@@ -28,7 +28,7 @@ if [[ "${CONFIRM}" == "yes" ]]; then
     echo -e "${NC}Enter AWS IAM User Access Key and Secret Key"
     echo "Access Key ID:"
     read AWS_ACCESS_KEY
-    echo "Enter Secret Access Key:"
+    echo "Secret Access Key:"
     read AWS_SECRET_KEY
 elif [[ "${CONFIRM}" == "no" ]] ; then
     echo -e "${RED}Aborting. Please create AWS IAM User with administrator privileges and run me again."
