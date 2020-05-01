@@ -39,6 +39,8 @@ AWS
             ALB
                 latency, errors
     [CI/CD]
+    [CloudTrail]
+    [Config]
 
 Docker
     nginx
