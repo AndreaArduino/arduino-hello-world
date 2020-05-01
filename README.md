@@ -76,3 +76,6 @@ Other considerations:
 * I have not adopted AWS EKS as a Docker orchestration tool because I have no experience with it - this is why I have chosen AWS ECS which on the other hand is a very stable and powerful AWS service designed for Docker orchestration.
 * I have adopted Nginx as a web server solution as it performs optimally when associated with UWSGI application server.
 * I have exploited AWS CloudFormation in order to deploy the AWS infrastructure with an *infrastructure-as-a-code* approach.
+
+## Useful links
+Docker images used in Hello World application may be found here: [Docker Hub repository](https://hub.docker.com/repository/docker/andreaarduino/arduino-hello-world)
